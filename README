@@ -31,9 +31,9 @@ Protective Measures:
 	* Login script will keep a log of attempts from ip addresses and will lock out certain
 	ip addresses (black list them) if a bruteforce (most likely a dictionary attack) is
 	detected (note: ip addr will be stored as a unsigned int to reduce size, using
-	[http://php.net/manual/en/function.ip2long.php]ip2long())
+	[http://php.net/manual/en/function.ip2long.php] ip2long())
 	* Passwords will be stored as salted
-	[http://ca3.php.net/manual/en/function.hash.php]hash("sha256") hashes;
+	[http://ca3.php.net/manual/en/function.hash.php] hash("sha256") hashes;
 	$mysql_pass = hash('sha256', $global_site_salt . $plaintext_pass . $mysql_user_random_salt)
-	* [http://net.tutsplus.com/tutorials/php/secure-your-forms-with-form-keys/]Form Keys will
+	* [http://net.tutsplus.com/tutorials/php/secure-your-forms-with-form-keys/] Form Keys will
 	be added to protect against outside attacks
