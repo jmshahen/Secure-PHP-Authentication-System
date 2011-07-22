@@ -28,6 +28,7 @@ class secure_user_auth {
 
 	function __construct($fetch = array())
 	{
+		$this->blacklist($_SERVER["REMOTE_ADDR"]);
 		$this->session_security();
 
 		if(is_array($fetch))
