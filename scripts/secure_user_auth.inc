@@ -39,7 +39,7 @@ class secure_user_auth {
 	/**
 	* checks if the ip address is on the blacklist
 	*
-	* @param string $ip
+	* @param string $ip must be in the format for {@link http://ca3.php.net/manual/en/function.ip2long.php ip2long()} (e.g. "127.0.0.1")
 	*/
 	function blacklist($ip)
 	{
@@ -47,8 +47,10 @@ class secure_user_auth {
 
 		if($ip !== FALSE)
 		{
-			$this->query("SELECT uid FROM ");
+			return $this->query("SELECT `uid` FROM ".$this->table_names["ip"]." WHERE `ip`='$ip'");
 		}
+
+		return false;
 	}
 
 	function fetch($fetch)
