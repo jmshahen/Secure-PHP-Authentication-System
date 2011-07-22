@@ -22,12 +22,6 @@ include_once "scripts/secure_user_auth.inc";
 * create a new instance of the secure_user_auth class
 */
 $sua = new secure_user_auth();
-
-/**
-* Check users ip addr is not blacklisted
-* if blacklisted redirect to blacklist webpage
-*/
-$sua->blacklist($_SERVER["REMOTE_ADDR"]);
 ?>
 
 <?php
