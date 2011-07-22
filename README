@@ -1,0 +1,39 @@
+Taken from http://www.rohitab.com/discuss/topic/37608-secure-php-authentication-system
+
+Introduction:
+	Hello all, this post is an overview for a tutorial I am about to write on creating a
+	Secure PHP Authentication System, it will include a feature list and what protection
+	feature/techniques it will use to make it self secure. Please feel free to comment
+	about anything I have forgotten to add in respect to security measures and please
+	leave comments suggesting features and improvements.
+
+Feature List:
+	* Login Script: username, password and a "remember me" option
+	* Registration Script: required [email, username, password, ReCaptcha]; sends email
+	confirmation with link to confirm creation of the account / validate the email address
+	* Sample Profile Page: shows login page for not logged in users; logged in
+	users will be shown their personal information and be allowed to change their password
+	* MySQL database will store username/password/email/etc
+	* Check for security cookie and will automatically log that user in
+
+
+Protective Measures:
+	* ALL input will be sanitized! stuff destined for mysql query will go through
+	[http://ca3.php.net/manual/en/function.mysql-real-escape-string.php] mysql_real_escape_string() /
+	[http://ca3.php.net/manual/en/function.addcslashes.php] addcslashes($str, "\x00\n\r\'\"\x1a\x3c\x3e\x25")
+	* Remember Me Cookie: will contain a security hash for a specific user, that is
+	also stored within the users database, the hash will contain salt + username +
+	email + ipaddr (though what the hash contains might change)
+	* Php Sessions will be used to remember who has logged in, and the session will
+	have an expiry time and will store the ip address (along with the user id and any
+	other convenient data)
+	* All attempts will be to remove any chance of XSS (filtering all input)
+	* Login script will keep a log of attempts from ip addresses and will lock out certain
+	ip addresses (black list them) if a bruteforce (most likely a dictionary attack) is
+	detected (note: ip addr will be stored as a unsigned int to reduce size, using
+	[http://php.net/manual/en/function.ip2long.php]ip2long())
+	* Passwords will be stored as salted
+	[http://ca3.php.net/manual/en/function.hash.php]hash("sha256") hashes;
+	$mysql_pass = hash('sha256', $global_site_salt . $plaintext_pass . $mysql_user_random_salt)
+	* [http://net.tutsplus.com/tutorials/php/secure-your-forms-with-form-keys/]Form Keys will
+	be added to protect against outside attacks
