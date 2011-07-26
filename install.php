@@ -74,7 +74,7 @@ if(isset($_POST["action"]))
 		case 2:
 		{
 			unlink(__FILE__);
-			
+
 			$html = <<<EOS
 <html>
 	<head>
@@ -83,11 +83,11 @@ if(isset($_POST["action"]))
 	<body>
 		<h1>Congradulations</h1>
 		<p>You have completely installed the Secure PHP Authentication System!</p>
-		<p>Please Note: The install script has just been deleted and configuration 
+		<p>Please Note: The install script has just been deleted and configuration
 		file (randomly named) has been created in the "scripts" folder. This file
 		stores the mysql username and password and the other configuration data,
 		please do all you can to not let people access this file. A .htaccess file
-		in located within the folder to protect all those files, but you should 
+		in located within the folder to protect all those files, but you should
 		make sure to limit the people who can access this folder.</p>
 	</body>
 </html>
@@ -129,23 +129,26 @@ EOS;
 				GRANT ALL ON "+data+"."+table_ip+" TO '"+user+"'@'localhost'; \
 				/*Only run this line once the table has been generated for you by me!*/";
 		}
+
+		//toggles the visibility of a given id
+		function toggle(id)
+		{
+			var elem = document.getElementById(id);
+
+			elem.style.display = elem.style.display == "none"? "block" : "none";
+		}
 		</script>
 	</head>
 	<body>
 		<h1>Welcome to PHP Secure Auth. System</h1>
 		<p>Author: Pongs &lt;pongs1@live.com&gt;</p>
 		<?php
-		if($_SERVER["SERVER_ADDR"] != "127.0.0.1"):
+			if($_SERVER["SERVER_ADDR"] != "127.0.0.1"):
 		?>
 		<p style="color: red;">Security Alert:<br/>
 			It is advised that complete this section under localhost (install not over the internet)
 		</p>
-		<?php 
-		endif;
-		
-		if(isset($error))
-		{ print $error; }
-		?>
+		<?php endif; ?>
 
 		<form method="post" action="">
 			<h2>User Credentials</h2>
@@ -158,7 +161,14 @@ EOS;
 				</code></i>
 			</p>
 			<p>
-				<table>
+				<b>SECURITY NOTICE:</b> If you select the check box below I will give you the code create a
+				very secure user that will only be for authentication system. This method will produce a
+				random username and password and generate the MySQL code needed to create this user and give
+				it access to the tables it needs.<br/>
+				<label><input type="checkbox" name="generate_user" onclick="toggle('user-cred')"/> Generate Secure User</label>
+			</p>
+			<p>
+				<table id="user-cred">
 					<tr>
 						<td>
 							Username:
