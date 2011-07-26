@@ -14,20 +14,28 @@ class secure_user_auth {
 	/**
 	* Constants used in __construct(), fetch(), get()
 	*/
-	const USERNAME = "username";
-	const PASSWORD = "password";
-	const USER_SALT = "user_salt";
-	const ALL_SESSION = "all_session";
+	const tableUSERS = "users";
+	const tableIP = "ip";
+	const getACTIVE_item = array("table"=>tableUSERS, "column"=>"active");
+	const getADMIN_item = array("table"=>tableUSERS, "column"=>"admin");
+	const getPASS_item = array("table"=>tableUSERS, "column"=>"password"); //used to validate login
+	const getSALT_item = array("table"=>tableUSERS, "column"=>"user_salt"); //used to validate login
+	const getUSER_item = array("table"=>tableUSERS, "column"=>"username");
+	//retrieves variables needed to fill the session varaible
+	const getSESSION_item_array = array(
+		getACTIVE,
+		getADMIN,
+		getUSER
+	);
 
 
 	public $data = array();
-	private $table_names = array(
-		"ip"=>"",
-		"user"=>""
-	);
+	private $config;
 
 	function __construct($fetch = array())
 	{
+		$this->config = $this->loadConfig();
+
 		$this->session_security();
 
 		if(is_array($fetch))
@@ -53,23 +61,57 @@ class secure_user_auth {
 		return false;
 	}
 
+	/**
+	* Pre-Fetches all the information the site will need
+	*
+	* If you supply as much information as you know you will need, this method will fetch
+	* all of it in as little queries as possible. This method should be altered to include
+	* other tables and data that you might want to pre-fetch to reduce stress on the SQL server
+	* @param array $fetch
+	* @return array
+	* @throws Requires $config["tables"]
+	* @throws Requires {@link $fetch} to be an array
+	* @todo figure out how to effectively use $where
+	*/
 	function fetch($fetch)
 	{
 		$select = array();
-		$where = array();
+		//$where = array();
+		$results = array();
 
 		if(is_array($fetch))
 		{
-			//
-			if(isset($fetch["USERNAME"]))
+			foreach($fetch as $item)
 			{
-				$select[] = USERNAME;
-				if(!empty($fetch["USERNAME"]))
-				{ $where[] = $fetch["USERNAME"]; }
+				//checks for valid item
+				if(is_array($item) && isset($item["table"]) && isset($item["column"]))
+				{
+					if(!isset($select[$item["table"]]))
+					{
+						$select[$item["table"]] = array();
+					}
+					//appends the column to select->table_name
+					$select[$item["table"]][] = $item["column"];
+				}
 			}
 
-			$select = array_unique($select);
-			$where = array_unique($where);
+			//removes all duplicate columns within the tables
+			foreach($select as $table)
+			{
+				$select[$table] = array_unique($select[$table]);
+				//$where[$table] = array_unique($where[$table]);
+
+				if(count($select[$table]) > 0)
+				{
+					$results[$table] = $this->query("SELECT `".implode($select[$table], "`, `")."` FROM `".$table."`");
+				}
+			}
+
+			return $results;
+		}
+		else
+		{
+			throw new Exception('$fetch must be an array.');
 		}
 	}
 
@@ -123,7 +165,7 @@ class secure_user_auth {
 	/**
 	* executes a query and returns the reults in array form
 	*
-	* @param mixed $query
+	* @param string $query
 	*/
 	function query($query)
 	{
