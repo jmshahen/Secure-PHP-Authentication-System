@@ -54,7 +54,7 @@ EOS;
 }
 
 //perform the action that is needed
-if(isset($_POST["action"])):
+if(isset($_POST["action"]))
 {
 	//doesn't allow anything but strings (excluds arrays)
 	if(!is_int($_POST["action"]))
@@ -74,7 +74,26 @@ if(isset($_POST["action"])):
 		case 2:
 		{
 			unlink(__FILE__);
-			break;
+			
+			$html = <<<EOS
+<html>
+	<head>
+		<title>Installation Done</title>
+	</head>
+	<body>
+		<h1>Congradulations</h1>
+		<p>You have completely installed the Secure PHP Authentication System!</p>
+		<p>Please Note: The install script has just been deleted and configuration 
+		file (randomly named) has been created in the "scripts" folder. This file
+		stores the mysql username and password and the other configuration data,
+		please do all you can to not let people access this file. A .htaccess file
+		in located within the folder to protect all those files, but you should 
+		make sure to limit the people who can access this folder.</p>
+	</body>
+</html>
+EOS;
+			die($html);
+			break; //habbit (don't need it since the script will 'die' before reaching this command)
 		}
 		default:
 		{
@@ -82,8 +101,7 @@ if(isset($_POST["action"])):
 		}
 	}
 }
-else:
-	//display the starting page
+//display the starting page
 ?>
 <html>
 	<head>
@@ -117,12 +135,17 @@ else:
 		<h1>Welcome to PHP Secure Auth. System</h1>
 		<p>Author: Pongs &lt;pongs1@live.com&gt;</p>
 		<?php
-			if($_SERVER["SERVER_ADDR"] != "127.0.0.1"):
+		if($_SERVER["SERVER_ADDR"] != "127.0.0.1"):
 		?>
 		<p style="color: red;">Security Alert:<br/>
 			It is advised that complete this section under localhost (install not over the internet)
 		</p>
-		<?php endif; ?>
+		<?php 
+		endif;
+		
+		if(isset($error))
+		{ print $error; }
+		?>
 
 		<form method="post" action="">
 			<h2>User Credentials</h2>
@@ -201,6 +224,3 @@ else:
 		</form>
 	</body>
 </html>
-<?php
-endif;
-?>
