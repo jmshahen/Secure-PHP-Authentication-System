@@ -14,26 +14,31 @@ class secure_user_auth {
 	/**
 	* Constants used in __construct(), fetch(), get()
 	*/
-	const tableUSERS = "users";
-	const tableIP = "ip";
-	const getACTIVE_item = array("table"=>tableUSERS, "column"=>"active");
-	const getADMIN_item = array("table"=>tableUSERS, "column"=>"admin");
-	const getPASS_item = array("table"=>tableUSERS, "column"=>"password"); //used to validate login
-	const getSALT_item = array("table"=>tableUSERS, "column"=>"user_salt"); //used to validate login
-	const getUSER_item = array("table"=>tableUSERS, "column"=>"username");
+	private $tableUSERS = "users";
+	private $tableIP = "ip";
+	public $gACTIVE = array("table"=>tableUSERS, "column"=>"active");
+	public $gADMIN = array("table"=>tableUSERS, "column"=>"admin");
+	public $gPASS = array("table"=>tableUSERS, "column"=>"password"); //used to validate login
+	public $gSALT = array("table"=>tableUSERS, "column"=>"user_salt"); //used to validate login
+	public $gUSERNAME = array("table"=>tableUSERS, "column"=>"username");
 	//retrieves variables needed to fill the session varaible
-	const getSESSION_item_array = array(
-		getACTIVE,
-		getADMIN,
-		getUSER
-	);
+	public $gSESSION;
 
-
+	/**
+	* put your comment there...
+	*
+	* @var array
+	*/
 	public $data = array();
 	private $config;
 
 	function __construct($fetch = array())
 	{
+		$this->gSESSION = array(
+			$this->gACTIVE,
+			$this->gADMIN,
+			$this->gUSERNAME
+		);
 		$this->config = $this->loadConfig();
 
 		$this->session_security();
@@ -59,6 +64,36 @@ class secure_user_auth {
 		}
 
 		return false;
+	}
+
+	/**
+	* checks if the data is already fetched and stored in the $this->data array
+	* it will also check the $_SESSION variable for the information
+	* If it cannot find the data it will fetch for it
+	*
+	* @param array $data
+	* @param boolean $forceFetch
+	*/
+	function get($data, $forceFetch=false)
+	{
+		if(is_array($data))
+		{
+			if(!isset($data["table"]) || !isset($data["column"]))
+			{
+				throw new Exception('$data is an invalid array.');
+			}
+
+			if($forceFetch)
+			{
+				return $this->fetch($data);
+			}
+
+			
+		}
+		else
+		{
+			throw new Exception('$data must be an array.');
+		}
 	}
 
 	/**
@@ -129,7 +164,11 @@ class secure_user_auth {
 		return false;
 	}
 
-
+	/**
+	* Checks the security of the current php session, checks for the valid IP Address,
+	*
+	*
+	*/
 	function session_security()
 	{
 		if(isset($_SESSION["IP_ADDR"]))
@@ -149,6 +188,13 @@ class secure_user_auth {
 			if($_SESSION["EXPIRES"] <= time())
 			{
 				session_unset();
+
+				//only used if the developer wishes to display a custom message
+				if(!isset($this->data["expired_count"]) && !is_int($this->data["expired_count"]))
+					{ $this->data["expired_count"] = 1; }
+				else
+					{ $this->data["expired_count"]++; }
+				$this->data["expired"] = 1;
 			}
 		}
 
@@ -157,7 +203,9 @@ class secure_user_auth {
 			//their session has expired
 			if($_SESSION["UPDATE"] <= time())
 			{
-				$this->
+				$data = $this->fetch($this->gSESSION);
+
+
 			}
 		}
 	}
