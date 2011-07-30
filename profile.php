@@ -39,6 +39,6 @@ if($sua.isUser(true)):
 </html>
 <?php
 else:
-	$sua.redirectToLoginPage();
+	$sua.redirectToLoginPage($_SERVER["REQUEST_URI"]);
 endif;
 ?>
