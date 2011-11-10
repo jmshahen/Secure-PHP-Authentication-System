@@ -211,6 +211,30 @@ class secure_user_auth {
 	}
 
 	/**
+	* checks whether the the user is trying to login and test to see if the IP has over drawn thier account tries
+	* 
+	* Returns 1 for trying to login, 0 for not trying and -1 for user suspended
+	* @return integer
+	*/
+	static function trying_to_login()
+	{
+		//check the POST variables to see if they are trying to login
+		if(true)
+		{
+			//check the IP address if it has tried to many times
+			if(false)
+			{
+				return -1
+			}
+			
+			return 1
+		}
+		
+		return 0;
+	}
+	
+	
+	/**
 	* executes a query and returns the reults in array form
 	*
 	* @param string $query
