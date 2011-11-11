@@ -32,18 +32,20 @@ class secure_user_auth {
 	public $data = array();
 	private $config;
 
-	function __construct($fetch = array())
+	function __construct($fetch=array())
 	{
 		$this->gSESSION = array(
 			$this->gACTIVE,
 			$this->gADMIN,
 			$this->gUSERNAME
 		);
+		
 		$this->config = $this->loadConfig();
 
-		$this->session_security();
+		$this->security_session();
+		$this->security_blocked_ip();
 
-		if(is_array($fetch))
+		if(is_array($fetch) && !empty($fetch))
 		{
 			$this->fetch($fetch);
 		}
@@ -73,36 +75,6 @@ class secure_user_auth {
 	static function display_login_script()
 	{
 		
-	}
-
-	/**
-	* checks if the data is already fetched and stored in the $this->data array
-	* it will also check the $_SESSION variable for the information
-	* If it cannot find the data it will fetch for it
-	*
-	* @param array $data
-	* @param boolean $forceFetch
-	*/
-	function get($data, $forceFetch=false)
-	{
-		if(is_array($data))
-		{
-			if(!isset($data["table"]) || !isset($data["column"]))
-			{
-				throw new Exception('$data is an invalid array.');
-			}
-
-			if($forceFetch)
-			{
-				return $this->fetch($data);
-			}
-
-			
-		}
-		else
-		{
-			throw new Exception('$data must be an array.');
-		}
 	}
 
 	/**
@@ -160,6 +132,36 @@ class secure_user_auth {
 	}
 
 	/**
+	* checks if the data is already fetched and stored in the $this->data array
+	* it will also check the $_SESSION variable for the information
+	* If it cannot find the data it will fetch for it
+	*
+	* @param array $data
+	* @param boolean $forceFetch
+	*/
+	function get($data, $forceFetch=false)
+	{
+		if(is_array($data))
+		{
+			if(!isset($data["table"]) || !isset($data["column"]))
+			{
+				throw new Exception('$data is an invalid array.');
+			}
+
+			if($forceFetch)
+			{
+				return $this->fetch($data);
+			}
+
+			
+		}
+		else
+		{
+			throw new Exception('$data must be an array.');
+		}
+	}
+	
+	/**
 	* checks if the current user is logged in
 	*
 	* @param mixed $active an extra check to make sure that the user is active
@@ -173,6 +175,44 @@ class secure_user_auth {
 		return false;
 	}
 
+	function loadConfig()
+	{
+		$this->config["script"] = array(
+			"ip_blocked_login" => "/scripts/blocked_ip.php"
+		);
+	}
+	
+	/**
+	* outputs a message to the user describing that their IP address is blocked
+	* 	Provides them with an alternative means of logging in
+	* 	A one time token link to be sent to the email assigned to the account
+	*
+	*/
+	static function login_blocked_ip_msg()
+	{
+		//TODO: Style this message
+		$str = <<<STR
+It has come to our attention that your IP Address ({$_SEERVER["REMOTE_ADDR"]}) has been associated or been involved in harmful
+activities towards this website. In order to prevent harm from coming to this website, we have 
+blocked access to this website from your IP Address ({$_SEERVER["REMOTE_ADDR"]}).
+<br/>
+<br/>
+If you are a valid user and need to access our website through the IP Address {$SERVER["REMOTE_ADDR"]}, 
+please enter your account name below and follow the instruction that are sent to your email.<br/>
+<form action="{$this->config["scripts"]["ip_blocked_login"]}">
+	Username: <input name="user" /><br/>
+	<input type="submit" value="Send Email" />
+</form>
+<div style="color: red;">
+* There is a 10 minute delay between emails will be sent and each email 
+token has a limited time length (as described in the email)<br/>
+** It is suggested that you do not use this IP Address to access the website as it has been known
+to be harmful to our systems and might be listening to your communications to y\our website.
+</div>
+STR;
+		return str;
+	}
+	
 	/**
 	* 
 	* 
@@ -196,7 +236,7 @@ class secure_user_auth {
 	*
 	*
 	*/
-	function session_security()
+	function security_session()
 	{
 		if(isset($_SESSION["IP_ADDR"]))
 		{
