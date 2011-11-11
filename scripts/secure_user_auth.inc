@@ -67,6 +67,15 @@ class secure_user_auth {
 	}
 
 	/**
+	* 
+	* 
+	*/
+	static function display_login_script()
+	{
+		
+	}
+
+	/**
 	* checks if the data is already fetched and stored in the $this->data array
 	* it will also check the $_SESSION variable for the information
 	* If it cannot find the data it will fetch for it
@@ -162,6 +171,24 @@ class secure_user_auth {
 			return ($active)? $_SESSION["active"] : true;
 		}
 		return false;
+	}
+
+	/**
+	* 
+	* 
+	*/
+	static function security_blocked_ip()
+	{
+		
+	}
+	
+	/**
+	* 
+	* 
+	*/
+	static function security_test_credentials()
+	{
+		
 	}
 
 	/**
