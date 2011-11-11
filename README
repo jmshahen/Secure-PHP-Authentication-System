@@ -37,3 +37,20 @@ Protective Measures:
 	$mysql_pass = hash('sha256', $global_site_salt . $plaintext_pass . $mysql_user_random_salt)
 	* [http://net.tutsplus.com/tutorials/php/secure-your-forms-with-form-keys/] Form Keys will
 	be added to protect against outside attacks
+
+Strict-Security Branch
+	The strict-security branch is created to hold the stricter version of the PHP Authentication System.
+	Splitting the code into branches will prevent files from becoming bulky and allow people to download
+	only the version they need and nothing more.
+	
+	* Secondary security validation questions required at sign-up
+	* Password Expirery date
+	* Email Confidense Expirery date - require the person to validate that they do indeed still have access 
+		to their email account. Also suggest that they change their email password for increased security.
+	* Optional Text Message feature (uses a free text service; might need to hack around thier captcha 
+		service to test this service [wont be difficult])...only a proof of concept, downloaders will need
+		to implement their own text message service.
+	* IP address safe list - Present first and second validations for any IP not on the safe list, requires multiple
+		successful logins at an IP address and a user confirmation before placing the IP address on the list.
+	* IP country warnings - If the IP address does not lie within the country the person specified on their 
+		contact information page, then delay login until email confirmation or secondary validation is completed.
