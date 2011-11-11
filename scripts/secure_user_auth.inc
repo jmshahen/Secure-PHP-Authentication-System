@@ -41,29 +41,13 @@ class secure_user_auth {
 		);
 		$this->config = $this->loadConfig();
 
-		$this->session_security();
+		//tries to login the user by a "remember me" cookie
+		$this->login_cookie();
 
 		if(is_array($fetch))
 		{
 			$this->fetch($fetch);
 		}
-	}
-
-	/**
-	* checks if the ip address is on the blacklist
-	*
-	* @param string $ip must be in the format for {@link http://ca3.php.net/manual/en/function.ip2long.php ip2long()} (e.g. "127.0.0.1")
-	*/
-	function blacklist($ip)
-	{
-		$ip = ip2long($ip);
-
-		if($ip !== FALSE)
-		{
-			return $this->query("SELECT `uid` FROM ".$this->table_names["ip"]." WHERE `ip`='$ip'");
-		}
-
-		return false;
 	}
 
 	/**
@@ -174,10 +158,9 @@ class secure_user_auth {
 	}
 
 	/**
-	* 
-	* 
+	* If a "Remember Me" cookie is found, try to log in the user
 	*/
-	static function security_blocked_ip()
+	function login_cookie()
 	{
 		
 	}
@@ -189,52 +172,6 @@ class secure_user_auth {
 	static function security_test_credentials()
 	{
 		
-	}
-
-	/**
-	* Checks the security of the current php session, checks for the valid IP Address,
-	*
-	*
-	*/
-	function session_security()
-	{
-		if(isset($_SESSION["IP_ADDR"]))
-		{
-			//someone stole the session (bad person)
-			//TODO: record ip address and block that person
-			if($_SESSION["IP_ADDR"] != $_SERVER{"REMOTE_ADDR"})
-			{
-				session_unset();
-				die("DON'T STEAL SESSIONS");
-			}
-		}
-
-		if(isset($_SESSION["EXPIRES"]))
-		{
-			//their session has expired
-			if($_SESSION["EXPIRES"] <= time())
-			{
-				session_unset();
-
-				//only used if the developer wishes to display a custom message
-				if(!isset($this->data["expired_count"]) && !is_int($this->data["expired_count"]))
-					{ $this->data["expired_count"] = 1; }
-				else
-					{ $this->data["expired_count"]++; }
-				$this->data["expired"] = 1;
-			}
-		}
-
-		if(isset($_SESSION["UPDATE"]))
-		{
-			//their session has expired
-			if($_SESSION["UPDATE"] <= time())
-			{
-				$data = $this->fetch($this->gSESSION);
-
-
-			}
-		}
 	}
 
 	/**
